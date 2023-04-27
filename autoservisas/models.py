@@ -1,5 +1,4 @@
-import datetime
-
+from django.utils import timezone
 from django.db import models
 
 # Create your models here.
@@ -56,29 +55,30 @@ class ServicePrice(models.Model):
         verbose_name = 'Service Price'
         verbose_name_plural = 'Service Prices'
 
-    # TODO - prideti manytomany fielda i admina per atskira methoda
 
-class Order(models.Model):
-    order_id = models.AutoField(primary_key=True)
-    order_date = models.DateTimeField(default=datetime.datetime.now)
+class OrderList(models.Model):
+    order_list_id = models.AutoField(primary_key=True)
+    order_date = models.DateTimeField(default=timezone.now)
     car = models.ForeignKey(Car, on_delete=models.SET_NULL, null=True)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
-    quantity = models.IntegerField()
     total_price = models.FloatField()
 
     def __str__(self):
-        return f"{self.car} - {self.service} - {self.total_price} - {self.order_date}"
+        return f"{self.car} - {self.order_date} - {self.total_price}"
+
+    class Meta:
+        verbose_name = 'Order List'
+        verbose_name_plural = 'Order Lists'
+
+class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
+    order_list_id = models.ForeignKey(OrderList, on_delete=models.SET_NULL, null=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+    price = models.FloatField()
+
+    def __str__(self):
+        return f"{self.order_list_id} - {self.service} - {self.quantity} - {self.price}"
 
     class Meta:
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
-
-# class OrderList(models.Model):
-#     order_list_id = models.AutoField(primary_key=True)
-#     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-#
-#     quantity = models.IntegerField()
-#     price = models.FloatField()
-#
-#     def __str__(self):
-#         return f"{self.service} - {self.quantity} - {self.price}"
