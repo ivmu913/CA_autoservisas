@@ -69,6 +69,7 @@ class OrderList(models.Model):
         verbose_name = 'Order List'
         verbose_name_plural = 'Order Lists'
 
+
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
     order_list_id = models.ForeignKey(OrderList, on_delete=models.SET_NULL, null=True)

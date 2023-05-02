@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Cars:</h1>
+{% for car in cars %}
+    <li>
+        <a href="{% url 'specific_car' car.car_id %}">{{car.brand}} - {{car.car_model}}, {{car.engine}}</a>
+    </li>
+{% endfor %}
+{% endblock %}
+
