@@ -1,7 +1,8 @@
-from .models import CarModel, Car, Service, ServicePrice, OrderList, Order
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 from django.views import generic
-
+from .models import Car, CarModel, Service, Order, OrderList
+from django.db.models import Q
 
 
 def index(request):
@@ -16,15 +17,14 @@ def index(request):
         'services': services,
         'services_count': services_count
     }
+    return render(request, 'index.html', context)
 
-    return render(request, "index.html", context)
 
-def cars(request):
-    all_cars = CarModel.objects.all()
-    context = {
-        'cars': all_cars,
-    }
-    return render(request, "cars.html", context)
+class CarListView(generic.ListView):
+    model = Car
+    paginate_by = 2
+    template_name = "cars.html"
+
 
 def specific_car(request, car_id):
     car = get_object_or_404(Car, pk=car_id)
@@ -35,21 +35,28 @@ def specific_car(request, car_id):
 def services(request):
     all_services = Service.objects.all()
     context = {
-        'services': all_services,
+        'services': all_services
     }
     return render(request, "services.html", context)
 
+
 def orders(request):
-    all_orders = OrderList.objects.all()
-    context = {
-        'orders': all_orders,
-    }
-    return render(request, "orders.html", context)
+    paginator = Paginator(OrderList.objects.all(), 2)
+    page_number = request.GET.get('page')
+    paged_orders = paginator.get_page(page_number)
+    return render(request, 'orders.html', {'orders': paged_orders})
 
 
-def specific_order(request, order_id):
-    specific_orders = get_object_or_404(Order, pk=order_id)
-    context = {
-        'specific_order': specific_orders,
-    }
+def specific_order(request, order_list_id):
+    order_list = get_object_or_404(OrderList, pk=order_list_id)
+    orders_of_order_list = Order.objects.filter(order_list_id__exact=order_list_id)
+    context = {'order_list': order_list, 'orders': orders_of_order_list}
     return render(request, "specific_order.html", context)
+
+
+def search_cars(request):
+    query = request.GET.get('query')
+    search_results = Car.objects.filter(Q(client__icontains=query) | Q(car_model__car_model__icontains=query)
+                                        | Q(car_model__brand__icontains=query) | Q(plate_nr__icontains=query)
+                                        | Q(vin_number__icontains=query))
+    return render(request, 'search_cars.html', {'cars': search_results, 'query': query})
