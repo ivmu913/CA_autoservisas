@@ -48,7 +48,7 @@ def orders(request):
 
 
 def specific_order(request, order_id):
-    specific_orders = Order.objects.all()
+    specific_orders = get_object_or_404(Order, pk=order_id)
     context = {
         'specific_order': specific_orders,
     }

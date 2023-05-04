@@ -78,7 +78,7 @@ class Order(models.Model):
     price = models.FloatField()
 
     def __str__(self):
-        return f"{self.order_list_id} - {self.service} - {self.quantity} - {self.price}"
+        return f"{self.order_id} - {self.service} - {self.quantity} - {self.price}"
 
     class Meta:
         verbose_name = 'Order'
